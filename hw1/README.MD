@@ -16,7 +16,7 @@ Yes, it is important that all features be on the same scale. If all the features
 2. What is the difference between a numeric and categorical feature? How might you
 	represent a categorical feature so your Nearest Neighbor classifier could work with it?
     
-    A numeric feature is a feature that is represented by a number like prices in dollars, height in inches, etc. A categorical feature is like a label, a feature that is not represented numerically like State, Height Description(Tall, Short), etc. We can use one hot encoding to let our nearest neighbor classifier work with categorical features. For example:
+A numeric feature is a feature that is represented by a number like prices in dollars, height in inches, etc. A categorical feature is like a label, a feature that is not represented numerically like State, Height Description(Tall, Short), etc. We can use one hot encoding to let our nearest neighbor classifier work with categorical features. For example:
     ```Python
     from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 	labelencoder_X = LabelEncoder()
