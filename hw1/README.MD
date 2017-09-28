@@ -1,3 +1,5 @@
+Part 1:
+
 1. In a Nearest Neighbor classifier, is it important that all features be on the same scale?
 	Think: what would happen if one feature ranges between 0-1, and another ranges
 	between 0-1000? If it is important that they are on the same scale, how could you
@@ -40,3 +42,21 @@ The importance of testing data is to make sure that the model is not merely memo
 why?
 
 A possible additional feature that could be useful is the hue of the petals. The Iris Viriginica is visibly a lighter shade of purple than the setosa and versicolor. So if we could somehow quantify the shade of colors of each instance, a metric that reflects a lighter shade could help predict an Iris Virginica.
+
+Part 2:
+
+1.	What are the strengths and weaknesses of using a Bag of Words? (Tip: would this
+	representation let you distinguish between two sentences the same words, but in a
+	different order?)
+
+One of the weaknesses of using a Bag of Words is that a BoW cannot read context. It can only tell when words appear, but not the semantics of those words. For example, it cannot tell the difference between the statement "This is good" and the question "Is this good?" because they are composed of the the same words. It's strength however is that it allows for extremely simply yet potentially powerful feature generation. So if the model does not require highly sophisticated classification, a bag of words would be simple and sufficiently efficient.
+
+
+2. Which of your features do you think is most predictive, least predictive, and why?
+
+The first 250 most common words in the supplied emails seem to be the most predictive features. When switching from the 100 most common words to 250, I saw a roughly 10% increase in accuracy in the model. After that, adding more common words seem to be less predective since there was hardly any change in accuracy when adding more words to the matrix of features.
+
+3. Did your classifier misclassify any examples? Why or why not?
+
+Yes, my classifier predicted these labels [0,0,0,1,1,1,0,1,0,1,1,1,0,0,1,0,0,0,1,0,1,0,1,1,1].
+However, the actual labels were [1,1,0,1,1,1,0,1,0,1,1,1,1,0,1,0,0,0,1,0,1,1,1,1,1]. Therefore it incorrectly labeled emails 26,27,38, and 47 (Which are 00,01,12,and 21 in the test set). Emails 26,27,38 were incorrectly labeled as not spam, while email 47 was incorrectly labeled as spam. The emails containing HTML tags may have messed up the classification of some of those emails. Dummy words added to the end of the emails would also be able to fool the bag of words. It is difficult to tell exactly what caused these misclassification because there is no way to look up what words are represented in the bag of word's one hot encoding. However the model is still 84% succesful which is pretty good given the small size of the dataset.
