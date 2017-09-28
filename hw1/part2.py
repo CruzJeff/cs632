@@ -100,3 +100,8 @@ print("The actual labels are: ", y_test)
 import sklearn.metrics
 accuracy = sklearn.metrics.accuracy_score(y_test, predictions)
 print("The accuracy of my KNN classifier is: ", accuracy)
+
+#Find misclassifications
+for x in range(25):
+    if predictions[x] is not y_test[x]:
+        print("Email number", x+25, "was misclassified")
