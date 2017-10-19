@@ -1,3 +1,4 @@
+#Script given from https://github.com/random-forests/cs632/blob/master/assignments/cats-vs-dogs/extract_cats_dogs.py
 import pickle
 import numpy as np
 from PIL import Image
