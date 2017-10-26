@@ -42,9 +42,9 @@ if "ids" in data:
 else:
     # generate some random ids
     ids = list(range(0,len(images)))
+    data["ids"] = ids
 
-data["ids"] = ids
-
+    
 OUT_FILE = "predictions.txt" #Name of OutPut file for predictions
 
 
