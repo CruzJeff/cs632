@@ -19,7 +19,7 @@ where it's run, called "predictions.txt".
 import sys
 import numpy as np
 from keras.models import load_model
-import time
+
 model = load_model('my_model') #Load the trained CNN from Part 1
 
 #Load Argument
@@ -36,9 +36,14 @@ data = np.load(TEST_FILE).item() #Unpack .npy file
 
 images = data["images"] #Get Images 
 
+#Generate IDs if not already present
+if "ids" in data:
+    ids = data["ids"]
+else:
+    # generate some random ids
+    ids = list(range(0,len(images)))
 
-ids = data["labels"] #Get Label for each testing image
-
+data["ids"] = ids
 
 OUT_FILE = "predictions.txt" #Name of OutPut file for predictions
 
@@ -47,20 +52,10 @@ OUT_FILE = "predictions.txt" #Name of OutPut file for predictions
 out = open(OUT_FILE, "w")  
 prediction = model.predict(images)
 print("Writing predictions to file")
-out.write("Labels" + " | " + "Predictions" + "\n")
+out.write("ids" + " | " + "Predictions" + "\n")
 for i, image in enumerate(images):
 
   image_id = ids[i]
   line = str(image_id) + "          " + str(prediction[i]) + "\n"
   out.write(line)
 out.close() 
-
-#Calculate errors
-print("Calculating errors")
-time.sleep(2)
-error = 0
-for x in range(2000):
-    if ids[x] != round(prediction[x][0]):
-        error = error + 1
-print("Number of misclassifications: ",error)
-
