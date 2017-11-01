@@ -73,7 +73,7 @@ Forest_Zenith = RandomForestRegressor(n_estimators=best_parameters['n_estimators
 Forest_Zenith.fit(X_train,y_train)
 
 #Cross Validate New Model
-accuracies = cross_val_score(estimator = Optimal_Forest, X = X_train, y = y_train, cv = 10, 
+accuracies = cross_val_score(estimator = Forest_Zenith, X = X_train, y = y_train, cv = 10, 
                              n_jobs=-1,scoring='neg_mean_squared_log_error')
 accuracies.mean()
 accuracies.std()
