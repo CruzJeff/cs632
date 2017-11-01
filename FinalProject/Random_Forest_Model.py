@@ -63,14 +63,14 @@ best_parameters = grid_search.best_params_
 
 
 #Create New Model Based on Results
-Optimal_Forest = RandomForestRegressor(n_estimators=best_parameters['n_estimators'], #890
+Forest_Zenith = RandomForestRegressor(n_estimators=best_parameters['n_estimators'], #890
                                         max_features=best_parameters['max_features'], #auto
                                         max_depth = best_parameters['max_depth'], #15
                                     min_samples_leaf= best_parameters['min_samples_leaf'],
                                     min_samples_split=best_parameters['min_samples_split'], 
                                     )
                                         
-Optimal_Forest.fit(X_train,y_train)
+Forest_Zenith.fit(X_train,y_train)
 
 #Cross Validate New Model
 accuracies = cross_val_score(estimator = Optimal_Forest, X = X_train, y = y_train, cv = 10, 
@@ -83,18 +83,13 @@ print("and standard deviation of: ", accuracies.std())
 
 #Save Model
 import pickle
-regressor = Optimal_Forest
+regressor = Forest_Zenith
 output = open('Forest_Zenith.pkl', 'wb')
 pickle.dump(regressor, output)
 output.close() 
 
-#Load Model
-from sklearn.externals import joblib
-Optimal_Forest = joblib.load('Optimal_Forest.pkl')
-
-
 #Make Predictions
-y_pred = Optimal_Forest.predict(X_test)
+y_pred = Forest_Zenith.predict(X_test)
 import math
 for x in range (len(y_pred)):
     y_pred[x] = math.exp(y_pred[x])
