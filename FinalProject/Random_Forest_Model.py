@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#Different Heading because this part was made in Arch Linux in order to do gridsearch on multiple CPUs
 """
 Created on Sat Oct 28 21:53:38 2017
 @author: zeox101
