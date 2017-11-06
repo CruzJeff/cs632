@@ -1,5 +1,5 @@
 # cs632
-Assignments for 
+Assignments for CS632
 
 HW1- K Nearest Neighbors Classifier
 
