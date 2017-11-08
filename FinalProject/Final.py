@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Oct 29 07:29:33 2017
-
+#Code for Stacking Model from https://www.kaggle.com/serigne/stacked-regressions-top-4-on-leaderboard
 @author: User
 """
 # Importing libraries
