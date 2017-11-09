@@ -17,7 +17,7 @@ test_ID = pd.read_csv("test_ID.csv")['Id']
         
 
 
-#Load The Three Base Models
+#Load The Base Models
 from sklearn.externals import joblib
 XGB_Zenith = joblib.load('XGB_Zenith.pkl')
 Zenith_Ridge = joblib.load('Zenith_Ridge.pkl')
@@ -53,8 +53,8 @@ class AveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
         ])
         return np.mean(predictions, axis=1)   
 
-Chimera = AveragingModels(models=(XGB_Zenith,Lasso_Zenith))
-Chimera.fit(X_train,y_train)
+Averaging_Model = AveragingModels(models=(XGB_Zenith,Lasso_Zenith))
+Averaging_Model.fit(X_train,y_train)
 
 from sklearn.model_selection import KFold
 class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
@@ -92,12 +92,12 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
             for base_models in self.base_models_ ])
         return self.meta_model_.predict(meta_features)
 
-stacked = StackingAveragedModels(base_models=(Chimera,XGB_Zenith),
+StackingModel = StackingAveragedModels(base_models=(Averaging_Model,XGB_Zenith),
                                  meta_model=Zenith_Net)
-stacked.fit(X_train.values,y_train)
+StackingModel.fit(X_train.values,y_train)
 
 #Make Predictions
-y_pred = stacked.predict(X_test.values)
+y_pred = StackingModel.predict(X_test.values)
 import math
 for x in range (len(y_pred)):
     y_pred[x] = math.exp(y_pred[x]) 
