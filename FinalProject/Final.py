@@ -34,7 +34,6 @@ XGB_Zenith = joblib.load('XGB_Zenith.pkl') #Loading saved XGBoost Regressor
 Zenith_Ridge = joblib.load('Zenith_Ridge.pkl') #Loading saved Ridge Regressor
 Zenith_Net = joblib.load('Zenith_Net.pkl') #Loading Elastic Net Regressor
 Lasso_Zenith = joblib.load('lasso_zenith.pkl') #Loading Lasso Regressor
-Zenith_Forest = joblib.load('Forest_Zenith.pkl') #Loading Random Forest Regressor
 Light = joblib.load('light.pkl') #Loading LightBoost Regressor
 
 #Creating the build function for the Deep Neural Network Regressor
