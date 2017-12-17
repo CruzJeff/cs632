@@ -5,7 +5,7 @@
 #
 #### Project Description:
 This project is based on the Kaggle Competition https://www.kaggle.com/c/house-prices-advanced-regression-techniques
-In this competition the Ames House Dataset is provided (http://ww2.amstat.org/publications/jse/v19n3/decock.pdf) and used to create models that accurately predict the sale prices of the house. The data description.txt file provided gives details on exactly what features are given for each example in the dataset.
+In this competition the Ames House Dataset is provided (http://ww2.amstat.org/publications/jse/v19n3/decock.pdf) and used to create models that accurately predict the sale prices of the houses. The data description.txt file provided gives details on exactly what features are given for each example in the dataset.
 
 Here's a brief version of what you'll find in the data description file.
     
