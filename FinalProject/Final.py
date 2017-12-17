@@ -16,10 +16,13 @@ X_train = pd.read_csv("X_train.csv")
 y_train = pd.read_csv("y_train.csv")
 X_test = pd.read_csv("X_test.csv")
 test_ID = pd.read_csv("test_ID.csv")['Id']
-        
+
+#Feature Scaling on Matrix of Features (These sets are only used for the DNN Regressor)
 sc_X = StandardScaler()
 X_train2 = sc_X.fit_transform(X_train)
 X_test2 = sc_X.transform(X_test)
+
+#Feature Scaling on Output Vector (This set is only used for the DNN Regressor)
 sc_y = StandardScaler()
 y_train2 = sc_y.fit_transform(y_train)
 y_train = pd.read_csv("y_train.csv")["SalePrice"]
@@ -27,44 +30,40 @@ y_train2 = y_train2.reshape(1458)
 
 #Load The Three Base Models
 from sklearn.externals import joblib
-XGB_Zenith = joblib.load('XGB_Zenith.pkl')
-Zenith_Ridge = joblib.load('Zenith_Ridge.pkl')
-Zenith_Net = joblib.load('Zenith_Net.pkl')
-Lasso_Zenith = joblib.load('lasso_zenith.pkl')
-Zenith_Forest = joblib.load('Forest_Zenith.pkl')
-Light = joblib.load('light.pkl')
-XGB_Zenith.fit(X_train,y_train)
-Zenith_Ridge.fit(X_train,y_train)
-Zenith_Net.fit(X_train,y_train)
-Lasso_Zenith.fit(X_train,y_train)
-Zenith_Forest.fit(X_train,y_train)
-Light.fit(X_train,y_train)
+XGB_Zenith = joblib.load('XGB_Zenith.pkl') #Loading saved XGBoost Regressor
+Zenith_Ridge = joblib.load('Zenith_Ridge.pkl') #Loading saved Ridge Regressor
+Zenith_Net = joblib.load('Zenith_Net.pkl') #Loading Elastic Net Regressor
+Lasso_Zenith = joblib.load('lasso_zenith.pkl') #Loading Lasso Regressor
+Zenith_Forest = joblib.load('Forest_Zenith.pkl') #Loading Random Forest Regressor
+Light = joblib.load('light.pkl') #Loading LightBoost Regressor
+
+#Creating the build function for the Deep Neural Network Regressor
 def dnn():
     DNN = load_model('DNN_Regressor')
     return DNN
 
-DNN_Regressor = KerasRegressor(build_fn=dnn, epochs=10, batch_size=5, verbose=0)
-DNN_Regressor.fit(X_train2,y_train2)
+#Wrapping the Neural Network in a KerasRegressor to use with Ensemble Model
 
-#Create Model
+DNN_Regressor = KerasRegressor(build_fn=dnn, epochs=10, batch_size=5, verbose=0)
+
+
+#Create Ensemble Model that uses the Average of base models
 from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
 class AveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
     def __init__(self, models):
         self.models = models
         
     # we define clones of the original models to fit the data in
-    def fit(self, X, y, X2, y2):
+    def fit(self, X, y, X2, y2): #X2 and Y2 are the scaled training data
         self.models_ = []
         for x in self.models:
-            if x is not DNN_Regressor:
-                self.models_.append(clone(x))
-            else:
-                self.models_.append(clone(x))
+            self.models_.append(clone(x))
         
         # Train cloned base models
         for model in self.models_:
             if str(type(model)) == "<class 'keras.wrappers.scikit_learn.KerasRegressor'>":
-                model.fit(X2,y2)
+            	#Separate branch because the DNN Regressor must be trained on the scaled dataset
+                model.fit(X2,y2) #
             else:
                 model.fit(X, y)
 
@@ -81,9 +80,12 @@ class AveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
         predictions = np.column_stack(predictions)
         return np.mean(predictions, axis=1)   
 
-Chimera = AveragingModels(models=(XGB_Zenith,Lasso_Zenith,Zenith_Net,DNN_Regressor,Light))
-Chimera.fit(X_train,y_train, X_train2, y_train2)
+#For the Average Model we used the 5th models that performed best on their own
+AvgModel = AveragingModels(models=(XGB_Zenith,Lasso_Zenith,Zenith_Net,DNN_Regressor,Light)) 
+AvgModel.fit(X_train,y_train, X_train2, y_train2)
 
+
+#Creating a new ensemble model that uses the predictions of the base models as a new feature for the meta-model
 from sklearn.model_selection import KFold
 class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
     def __init__(self, base_models, meta_model, n_folds=5):
@@ -101,7 +103,8 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
         # that are needed to train the cloned meta-model
         out_of_fold_predictions = np.zeros((X.shape[0], len(self.base_models)))
         for i, model in enumerate(self.base_models):
-            if str(type(model)) != "<class '__main__.AveragingModels'>":
+        	#Since the AVGModel contains the DNN, it must be handled separately
+            if str(type(model)) != "<class '__main__.AveragingModels'>": 
                 for train_index, holdout_index in kfold.split(X, y):
                     instance = clone(model)
                     self.base_models_[i].append(instance)
@@ -123,19 +126,20 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
    
     #Do the predictions of all base models on the test data and use the averaged predictions as 
     #meta-features for the final prediction which is done by the meta-model
-    def predict(self, X, X2):
+    def predict(self, X, X2): 
         
         meta_features = np.column_stack([
         np.column_stack([model.predict(X) 
         if (str(type(model)) != "<class '__main__.AveragingModels'>") 
-        else model.predict(X, X2) 
+        else model.predict(X, X2)  #Special Consideration for the AVGModel's predict method
         for model in base_models]).mean(axis=1)
         for base_models in self.base_models_ ])
             
         print(meta_features)
         return self.meta_model_.predict(meta_features)
 
-stacked = StackingAveragedModels(base_models=(Chimera,XGB_Zenith,Light),
+#For the stacked model, multiple combinations of base_models and meta_models were used until reaching this combination
+stacked = StackingAveragedModels(base_models=(AvgModel,XGB_Zenith,Light),
                                  meta_model=Zenith_Net)
 
 stacked.fit(X_train.values,y_train, X_train2, y_train2)
