@@ -139,7 +139,7 @@ class StackingAveragedModels(BaseEstimator, RegressorMixin, TransformerMixin):
         return self.meta_model_.predict(meta_features)
 
 #For the stacked model, multiple combinations of base_models and meta_models were used until reaching this combination
-stacked = StackingAveragedModels(base_models=(AvgModel,XGB_Zenith,Light),
+stacked = StackingAveragedModels(base_models=(AvgModel,XGB_Zenith),
                                  meta_model=Zenith_Net)
 
 stacked.fit(X_train.values,y_train, X_train2, y_train2)
