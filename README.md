@@ -1,7 +1,7 @@
 # cs632
 Assignments for CS632
 
-HW1- K Nearest Neighbors Classifier
+HW1- K Nearest Neighbors Spam Classifier
 
 HW2- Convolutional Neural Network Dog vs Cat Classifier
 
